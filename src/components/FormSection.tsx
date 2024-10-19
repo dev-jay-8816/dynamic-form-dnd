@@ -1,14 +1,15 @@
 import { FC, useRef, useState, useEffect } from 'react'
-import { Formik, Form, FormikProps } from 'formik'
+import { Formik, Form, FormikProps, FormikHelpers } from 'formik'
 import * as Yup from 'yup'
 
 import FieldRenderer from './FormFields/FieldRenderer'
 import { useFormData } from '../contexts/form.context'
 import { generateYupFormValidationSchema } from '../schemas/form.schema'
 import { FormValueType, YupField } from '../interfaces/form.interface'
-import {  getInitialFormValues, getFormAttributeFromStorage, saveFormAttributeInStorage, removeFormAttributeFromStorage } from '../utils/form.util'
+import { getInitialFormValues, getFormAttributeFromStorage, saveFormAttributeInStorage, removeFormAttributeFromStorage } from '../utils/form.util'
 import { DndContext, DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import { DroppableSection } from './Droppable'
+import { toast } from 'react-toastify'
 
 const FORM_FIELD_DROPPABLE_ID = 'form-field-droppable-id'
 const FormSection: FC = () => {
@@ -25,7 +26,7 @@ const FormSection: FC = () => {
         [x: string]: undefined;
     }, ""> | undefined>(undefined);
     const formikRef = useRef<FormikProps<any>>(null);
-    // const [setActiveDragId] = useState<string | null>(null);
+    const [, setActiveDragId] = useState<string | null>(null);
 
 
     //Change the current-schema
@@ -48,8 +49,10 @@ const FormSection: FC = () => {
         }
     }, [])
 
-    const handleFormSubmit = (values: FormValueType) => {
+    const handleFormSubmit = (values: FormValueType, actions: FormikHelpers<FormValueType>) => {
         saveFormAttributeInStorage('formValues', values);
+        setTimeout(() => actions?.setSubmitting(false), 800)
+        toast('Form data saved successfully!')
     }
 
     const handleReset = () => {
@@ -57,6 +60,7 @@ const FormSection: FC = () => {
         removeFormAttributeFromStorage('formValues')
         setFormValues(null)
         resetFormStructure();
+        toast('Reset form data successfully!')
     }
 
     const handleDragEnd = (e: DragEndEvent) => {
@@ -100,16 +104,16 @@ const FormSection: FC = () => {
                 if (group.title === activeSection) {
                     updatedFormStructure.form.groups[i].fields = activeSectionFields;
                 }
-                
+
             }
             setFormStructure(updatedFormStructure);
+            toast('Form structure saved successfully!')
         }
 
-        // setActiveDragId(null);
+        setActiveDragId(null);
     }
     const handleDragStart = (e: DragStartEvent) => {
-        console.log("DragStartEvent: ", e)
-        // setActiveDragId(e?.active?.id as string);
+        if (e?.active?.id) setActiveDragId(e?.active?.id as string);
     }
 
     return (
@@ -127,7 +131,9 @@ const FormSection: FC = () => {
                         onSubmit={handleFormSubmit}
                         enableReinitialize
                     >
-                        {() => {
+                        {({
+                            isSubmitting
+                        }) => {
                             return (
                                 <Form>
                                     <DndContext
@@ -161,10 +167,11 @@ const FormSection: FC = () => {
                                                 Reset
                                             </button>
                                             <button
+                                                disabled={isSubmitting}
                                                 type="submit"
                                                 className="btn btn-primary"
                                             >
-                                                Submit
+                                                {isSubmitting ? 'Loading...' : 'Submit'}
                                             </button>
                                         </div>
                                     </div>
