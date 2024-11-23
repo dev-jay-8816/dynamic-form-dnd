@@ -8,11 +8,12 @@ import { getFormAttributeFromStorage, removeFormAttributeFromStorage, saveFormAt
 interface IFormContext {
   formStructure: FormStructure;
   setFormStructure: React.Dispatch<React.SetStateAction<FormStructure>>;
-  formSectionTitle: string[];
+  formSectionTitleAndId: { title: string; id: string }[];
   formFields: FormField[];
   activeSection: string;
   toggleActiveSection: (section: string) => void;
   resetFormStructure: () => void;
+  getActiveSectionTitle: () => string | undefined;
 }
 
 interface IFormProvider {
@@ -33,9 +34,14 @@ const FormProvider: FC<IFormProvider> = ({
   ); //Static
 
 
-  const formSectionTitle = useMemo(() => {
-    const sectionTitle = formStructure?.form?.groups?.map(el => el?.title);
-    return sectionTitle;
+  const formSectionTitleAndId = useMemo(() => {
+    const sectionTitleAndId = formStructure?.form?.groups?.map(el => {
+      return {
+        title: el?.title,
+        id: el?.id
+      }
+    });
+    return sectionTitleAndId;
   }, [formStructure])
 
   // Save the form-structure.
@@ -44,10 +50,10 @@ const FormProvider: FC<IFormProvider> = ({
     saveFormAttributeInStorage('formStructure', currFormStructure);
   }, [formStructure])
 
-  const [activeSection, setActiveSection] = useState(formSectionTitle?.[0]);
+  const [activeSection, setActiveSection] = useState(formSectionTitleAndId?.[0]?.id);
 
   const formFields = useMemo(() => {
-    const fields = formStructure?.form?.groups?.find(el => el?.title === activeSection)?.fields ?? [];
+    const fields = formStructure?.form?.groups?.find(el => el?.id === activeSection)?.fields ?? [];
     return fields as FormField[];
   }, [formStructure, activeSection])
 
@@ -63,14 +69,19 @@ const FormProvider: FC<IFormProvider> = ({
     setFormStructure(defaultFormStructure);
   }
 
+  const getActiveSectionTitle = () => {
+    return formSectionTitleAndId?.find(el => el?.id === activeSection)?.title;
+  }
+
   const value = {
     formStructure,
     setFormStructure,
-    formSectionTitle,
+    formSectionTitleAndId,
     formFields,
     toggleActiveSection,
     activeSection,
-    resetFormStructure
+    resetFormStructure,
+    getActiveSectionTitle
   }
 
   return (

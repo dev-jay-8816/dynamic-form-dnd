@@ -29,3 +29,9 @@ export const generateYupFormValidationSchema = (yupFields: YupField[] = []) => {
 
     return Yup.object().shape(shape);
 }
+
+
+export const addFormSectionValidationSchema = Yup.object().shape({
+    title: Yup.string().required('Title is Required.'),
+    order: Yup.number().required('Select the Order')
+})

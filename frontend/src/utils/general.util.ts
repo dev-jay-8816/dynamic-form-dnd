@@ -10,4 +10,4 @@ export const isLabelValueObjArray = (
   return typeof options[0] === 'object' && 'label' in options[0] && 'value' in options[0];
 };
 
-
+export const generateUUID = (): string => crypto.randomUUID();

@@ -1,3 +1,5 @@
+import { FieldType } from "./form.interface";
+
 export interface FormStructure {
     form: Form
   }
@@ -9,13 +11,15 @@ export interface FormStructure {
   }
   
   export interface Group {
+    id: string;
     title: string
     fields: Field[]
   }
   
   export interface Field {
+    id: string;
     label: string
-    type: string
+    type: FieldType;
     name: string
     placeholder?: string
     required?: boolean

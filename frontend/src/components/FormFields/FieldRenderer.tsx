@@ -20,7 +20,7 @@ const FieldRenderer: FC<Props> = (props) => {
   const { fieldType, otherProps } = props;
   return (
     // <div className='col-md-6 d-flex align-items-center mt-4'>
-    <Draggable id={otherProps?.name}>
+    <Draggable id={otherProps?.id}>
       {(() => {
         switch (fieldType) {
           case 'text':

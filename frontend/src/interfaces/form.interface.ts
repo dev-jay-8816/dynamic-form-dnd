@@ -1,7 +1,9 @@
 export type FieldType = 'text' | 'textarea' | 'dropdown' | 'radio' | 'number' | 'checkbox' | 'slider' | 'email' | 'password';
 export type OptionsType = string[] | Array<{ label: string, value: string | number }>;
+export type FormValueType = Record<string, string | number | string[] | boolean>;
 
 export interface FormField {
+    id: string;
     label: string
     type: FieldType
     name: string
@@ -20,4 +22,8 @@ export interface YupField {
     type: FieldType;
 }
 
-export type FormValueType = Record<string, string | number | string[] | boolean>;
+export interface AddFormSectionSchema {
+    title: string;
+    order: number;
+}
+
